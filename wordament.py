@@ -34,7 +34,7 @@ def word_search( i,j, word, visited ):
     word_copy = word_copy + game_grid[i][j]
     (found, prefix) = check_word(dictionary, word_copy)
     if found and len(word) >= 3:
-	    print word
+	    print word_copy
     if prefix and len(word_copy) < DEPTHBOUND:
         word_search( i+1, j, word_copy, visited_copy )
         word_search( i+1, j+1, word_copy, visited_copy )
