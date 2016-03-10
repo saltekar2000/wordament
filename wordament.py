@@ -17,14 +17,14 @@ def check_word( dictionary, word ):
     return (found, prefix)
     
 
-game_grid = [['l','s','e','a'], 
-             ['k','a','s','r'], 
-             ['e','a','n','e'],
-             ['s','r','i','l']]
+#game_grid = [['l','s','e','a'], 
+#             ['k','a','s','r'], 
+#             ['e','a','n','e'],
+#             ['s','r','i','l']]
 
 
 # depth first search for words starting from (i,j)
-def word_search( i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZE),dtype=np.bool)):
+def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZE),dtype=np.bool)):
     # return if out of bounds or already visited
     if i < 0 or j < 0 or i >= GRIDSIZE or j >= GRIDSIZE or visited[i][j]:
         return
@@ -33,27 +33,35 @@ def word_search( i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZE),dtype=np
     word = word + game_grid[i][j]
     # search for word in dictionary and record it if found
     (found, prefix) = check_word(dictionary, word)
-    if found and len(word) >= 3:
+    if found and len(word) >= 6:
 	    print word
     # continue on if word is prefix of another word 
     if prefix and len(word) < DEPTHBOUND:
-        word_search( i+1, j, word, visited )
-        word_search( i+1, j+1, word, visited )
-        word_search( i, j+1, word, visited )
-        word_search( i-1, j+1, word, visited )
-        word_search( i-1, j, word, visited )
-        word_search( i-1, j-1, word, visited )
-        word_search( i, j-1, word, visited )
-        word_search( i+1, j-1, word, visited )
+        word_search( game_grid, i+1, j, word, visited )
+        word_search( game_grid, i+1, j+1, word, visited )
+        word_search( game_grid, i, j+1, word, visited )
+        word_search( game_grid, i-1, j+1, word, visited )
+        word_search( game_grid, i-1, j, word, visited )
+        word_search( game_grid, i-1, j-1, word, visited )
+        word_search( game_grid, i, j-1, word, visited )
+        word_search( game_grid, i+1, j-1, word, visited )
     # mark as unvisited and remove character from word just before return
     visited[i][j] = False
     word = word[:-1]
 
-
+# search for words starting at every possible location
 def grid_search( game_grid ):
     for i in range(GRIDSIZE):
         for j in range(GRIDSIZE):
-            word_search( i, j )
+            word_search( game_grid, i, j )
             
-grid_search(game_grid)		    
-		
+
+if __name__ == "__main__":
+    row1 = raw_input('enter row1:')
+    row2 = raw_input('enter row2:')
+    row3 = raw_input('enter row3:')
+    row4 = raw_input('enter row4:')
+    game_grid = [ [c for c in row1], [c for c in row2], [c for c in row3], [c for c in row4] ]
+    grid_search(game_grid)
+    
+    
