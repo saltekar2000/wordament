@@ -22,6 +22,7 @@ def check_word( dictionary, word ):
 #             ['e','a','n','e'],
 #             ['s','r','i','l']]
 
+results = set()
 
 # depth first search for words starting from (i,j)
 def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZE),dtype=np.bool)):
@@ -33,8 +34,8 @@ def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZ
     word = word + game_grid[i][j]
     # search for word in dictionary and record it if found
     (found, prefix) = check_word(dictionary, word)
-    if found and len(word) >= 6:
-	    print word
+    if found and len(word) >= 3:
+	    results.add(word)
     # continue on if word is prefix of another word 
     if prefix and len(word) < DEPTHBOUND:
         word_search( game_grid, i+1, j, word, visited )
@@ -63,5 +64,7 @@ if __name__ == "__main__":
     row4 = raw_input('enter row4:')
     game_grid = [ [c for c in row1], [c for c in row2], [c for c in row3], [c for c in row4] ]
     grid_search(game_grid)
+    for word in results:
+        print word
     
     
