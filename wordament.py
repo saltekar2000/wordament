@@ -64,7 +64,7 @@ if __name__ == "__main__":
     row4 = raw_input('enter row4:')
     game_grid = [ [c for c in row1], [c for c in row2], [c for c in row3], [c for c in row4] ]
     grid_search(game_grid)
-    for word in results:
+    for word in sorted(results,key=len,reverse=True):
         print word
     
     
