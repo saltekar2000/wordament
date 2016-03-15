@@ -1,13 +1,13 @@
 import numpy as np
 from bisect import bisect_right
-from copy import deepcopy
+import re
 
 GRIDSIZE = 4
 DEPTHBOUND = 16
 
 # read in standard dictionary shipped with linux
 dictionary = [word.strip() for word in open('/usr/share/dict/words') if word[0].islower() and word.find("'") == -1]  
-	
+    
 def check_word( dictionary, word ):
     i = bisect_right(dictionary, word)
     if i == len(dictionary):
@@ -35,7 +35,7 @@ def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZ
     # search for word in dictionary and record it if found
     (found, prefix) = check_word(dictionary, word)
     if found and len(word) >= 3:
-	    results.add(word)
+        results.add(word)
     # continue on if word is prefix of another word 
     if prefix and len(word) < DEPTHBOUND:
         word_search( game_grid, i+1, j, word, visited )
@@ -56,13 +56,26 @@ def grid_search( game_grid ):
         for j in range(GRIDSIZE):
             word_search( game_grid, i, j )
             
-
+def parse_row( row ):
+    pat = '[a-z]|\[-?[a-z]{2}\]|\[[a-z]{2}-\]|\[[a-z]\|[a-z]\]'
+    strict_pat = re.compile('^(?:' + pat + '){4}$')
+    if re.match(strict_pat, row) is None:
+        return None
+    extract_pat = re.compile('(' + pat + ')')
+    parsed_row = [entry[1:-1] if len(entry) > 1 else entry for entry in re.findall(extract_pat,row)]
+    return parsed_row
+    
 if __name__ == "__main__":
-    row1 = raw_input('enter row1:')
-    row2 = raw_input('enter row2:')
-    row3 = raw_input('enter row3:')
-    row4 = raw_input('enter row4:')
-    game_grid = [ [c for c in row1], [c for c in row2], [c for c in row3], [c for c in row4] ]
+    game_grid = []
+    for r in range(1,GRIDSIZE+1):
+        repeat = True
+        while repeat:
+            row = raw_input('enter row'+str(r)+':')
+            parsed_row = parse_row(row)
+            repeat = parsed_row is None
+            if repeat:
+                print 'ERROR try again.'
+        game_grid.append(parsed_row)
     grid_search(game_grid)
     for word in sorted(results,key=len,reverse=True):
         print word
