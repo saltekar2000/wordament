@@ -29,26 +29,42 @@ def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZ
     # return if out of bounds or already visited
     if i < 0 or j < 0 or i >= GRIDSIZE or j >= GRIDSIZE or visited[i][j]:
         return
-    # mark as visited and extend word
+    # return if required to be starting letters and are not
+    if len(game_grid[i][j]) == 3 and game_grid[i][j][2] == '-' and len(word) > 0:
+        return    
+    # mark as visited
     visited[i][j] = True
-    word = word + game_grid[i][j]
-    # search for word in dictionary and record it if found
-    (found, prefix) = check_word(dictionary, word)
-    if found and len(word) >= 3:
-        results.add(word)
-    # continue on if word is prefix of another word 
-    if prefix and len(word) < DEPTHBOUND:
-        word_search( game_grid, i+1, j, word, visited )
-        word_search( game_grid, i+1, j+1, word, visited )
-        word_search( game_grid, i, j+1, word, visited )
-        word_search( game_grid, i-1, j+1, word, visited )
-        word_search( game_grid, i-1, j, word, visited )
-        word_search( game_grid, i-1, j-1, word, visited )
-        word_search( game_grid, i, j-1, word, visited )
-        word_search( game_grid, i+1, j-1, word, visited )
-    # mark as unvisited and remove character from word just before return
+    # extract 1 or 2 suffixes
+    suffixes = []
+    if len(game_grid[i][j]) == 3:
+        if game_grid[i][j][0] == '-':
+            suffixes.append(game_grid[i][j][1:])
+        elif game_grid[i][j][2] == '-':
+            suffixes.append(game_grid[i][j][0:-1])
+        else: 
+            suffixes.append(game_grid[i][j][0])
+            suffixes.append(game_grid[i][j][2])
+    else:
+        suffixes.append(game_grid[i][j])
+    for s in suffixes:
+        word = word + s
+        # search for word in dictionary and record it if found
+        (found, prefix) = check_word(dictionary, word)
+        if found and len(word) >= 3:
+            results.add(word)
+        # continue on if word is prefix of another word 
+        if game_grid[i][j][0] != '-' and prefix and len(word) < DEPTHBOUND:
+            word_search( game_grid, i+1, j, word, visited )
+            word_search( game_grid, i+1, j+1, word, visited )
+            word_search( game_grid, i, j+1, word, visited )
+            word_search( game_grid, i-1, j+1, word, visited )
+            word_search( game_grid, i-1, j, word, visited )
+            word_search( game_grid, i-1, j-1, word, visited )
+            word_search( game_grid, i, j-1, word, visited )
+            word_search( game_grid, i+1, j-1, word, visited )
+        word = word[:-len(s)]
+    # mark as unvisited 
     visited[i][j] = False
-    word = word[:-1]
 
 # search for words starting at every possible location
 def grid_search( game_grid ):
