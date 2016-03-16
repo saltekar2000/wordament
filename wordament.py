@@ -1,3 +1,13 @@
+"""
+Solver for wordament game.
+Four rows of the game are entered as follows:
+enter row1: ab[cd]e
+enter row2: [fg-]hij
+enter row3: klm[n|o]
+enter row4: [-p]qrs
+It finds all the words using the standard unix dictionary and prints them out from largest to 
+smallest.
+"""
 import numpy as np
 from bisect import bisect_right
 import re
@@ -15,13 +25,8 @@ def check_word( dictionary, word ):
     prefix = dictionary[i].startswith(word)
     found = dictionary[i-1] == word
     return (found, prefix)
-    
 
-#game_grid = [['l','s','e','a'], 
-#             ['k','a','s','r'], 
-#             ['e','a','n','e'],
-#             ['s','r','i','l']]
-
+# results from the word search are stored here    
 results = set()
 
 # depth first search for words starting from (i,j)
@@ -34,16 +39,15 @@ def word_search( game_grid, i,j, word = '', visited = np.zeros((GRIDSIZE,GRIDSIZ
         return    
     # mark as visited
     visited[i][j] = True
-    # extract 1 or 2 suffixes
+    # extract 1 or 2 suffixes from current square
     suffixes = []
-    if len(game_grid[i][j]) == 3:
-        if game_grid[i][j][0] == '-':
-            suffixes.append(game_grid[i][j][1:])
-        elif game_grid[i][j][2] == '-':
-            suffixes.append(game_grid[i][j][0:-1])
-        else: 
-            suffixes.append(game_grid[i][j][0])
-            suffixes.append(game_grid[i][j][2])
+    if game_grid[i][j][0] == '-':
+        suffixes.append(game_grid[i][j][1:])
+    elif game_grid[i][j][-1] == '-':
+        suffixes.append(game_grid[i][j][:-1])
+    elif len(game_grid[i][j]) == 3 and game_grid[i][j][1] == '|': 
+        suffixes.append(game_grid[i][j][0])
+        suffixes.append(game_grid[i][j][-1])
     else:
         suffixes.append(game_grid[i][j])
     for s in suffixes:
@@ -73,7 +77,7 @@ def grid_search( game_grid ):
             word_search( game_grid, i, j )
             
 def parse_row( row ):
-    pat = '[a-z]|\[-?[a-z]{2}\]|\[[a-z]{2}-\]|\[[a-z]\|[a-z]\]'
+    pat = '[a-z]|\[-?[a-z]{1,2}\]|\[[a-z]{1,2}-\]|\[[a-z]\|[a-z]\]'
     strict_pat = re.compile('^(?:' + pat + '){4}$')
     if re.match(strict_pat, row) is None:
         return None
